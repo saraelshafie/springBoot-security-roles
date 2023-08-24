@@ -28,13 +28,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity //tells spring security that this class is a web security configuration
 public class SecurityConfiguration{
 
-    private JwtAuthEntryPoint authEntryPoint;
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfiguration(CustomUserDetailsService userDetailsService, JwtAuthEntryPoint authEntryPoint) {
+    public SecurityConfiguration(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
-        this.authEntryPoint = authEntryPoint;
     }
 
     @Bean
@@ -42,20 +40,13 @@ public class SecurityConfiguration{
 
         http
                 .csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authEntryPoint)
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 .authorizeRequests()
                 .antMatchers("/h2-console/**").permitAll() // Allow access to H2 Console
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/auth/**").permitAll()  //Allow access to login and register pages
                 .antMatchers(HttpMethod.POST).permitAll()
-                .anyRequest().authenticated();
-
-
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().authenticated()
+                .and()
+                .headers().frameOptions().disable();;
 
         return http.build();
 
@@ -71,11 +62,6 @@ public class SecurityConfiguration{
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public JWTAuthenticationFilter jwtAuthenticationFilter(){
-        return new JWTAuthenticationFilter();
     }
 
 

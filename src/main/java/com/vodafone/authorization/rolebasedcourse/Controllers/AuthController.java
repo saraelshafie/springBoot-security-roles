@@ -7,9 +7,7 @@ import com.vodafone.authorization.rolebasedcourse.Model.Role;
 import com.vodafone.authorization.rolebasedcourse.Model.UserEntity;
 import com.vodafone.authorization.rolebasedcourse.Repositories.RoleRepository;
 import com.vodafone.authorization.rolebasedcourse.Repositories.UserRepository;
-import com.vodafone.authorization.rolebasedcourse.Security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
 import java.util.Collections;
 
 @RestController
@@ -33,15 +30,12 @@ public class AuthController {
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
 
-    private JWTGenerator jwtGenerator;
-
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtGenerator = jwtGenerator;
     }
 
 
@@ -63,14 +57,13 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(),
                 loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication); //holds all the auth details to not log in each time
 
-        String token = jwtGenerator.generateToken(authentication);
-        return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
+        return new ResponseEntity<>("User logged in successfully", HttpStatus.OK);
     }
 }
