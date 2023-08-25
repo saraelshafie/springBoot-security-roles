@@ -41,11 +41,11 @@ public class SecurityConfiguration{
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/h2-console/**").permitAll() // Allow access to H2 Console
-                .antMatchers("/api/auth/**").permitAll()  //Allow access to login and register pages
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/devTeam/**").hasAnyRole("DEV", "ADMIN")
+                .antMatchers("/h2-console/**").permitAll() // Allow access to H2 Console
+                .antMatchers("/api/auth/**").permitAll()  //Allow access to login and register pages
                 .anyRequest().authenticated()
                 .and().formLogin()
                 .and()
