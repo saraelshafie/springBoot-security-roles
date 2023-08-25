@@ -43,10 +43,13 @@ public class SecurityConfiguration{
                 .authorizeRequests()
                 .antMatchers("/h2-console/**").permitAll() // Allow access to H2 Console
                 .antMatchers("/api/auth/**").permitAll()  //Allow access to login and register pages
-                .antMatchers(HttpMethod.POST).permitAll()
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/devTeam/**").hasAnyRole("DEV", "ADMIN")
                 .anyRequest().authenticated()
+                .and().formLogin()
                 .and()
-                .headers().frameOptions().disable();;
+                .headers().frameOptions().disable();
 
         return http.build();
 

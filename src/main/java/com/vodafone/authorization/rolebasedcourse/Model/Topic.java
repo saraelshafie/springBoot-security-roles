@@ -8,17 +8,13 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "topics")
+public class Topic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+    private Integer id;
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "team_id", referencedColumnName = "id") // This indicates the foreign key column in the Role table
-    private Team team;
+    private String description;
 
 }

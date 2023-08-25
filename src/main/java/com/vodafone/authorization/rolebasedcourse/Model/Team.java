@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "team")
+public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,8 +19,6 @@ public class Role {
 
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "team_id", referencedColumnName = "id") // This indicates the foreign key column in the Role table
-    private Team team;
-
+    @OneToMany(mappedBy = "team")
+    private List<Role> roles = new ArrayList<>();
 }

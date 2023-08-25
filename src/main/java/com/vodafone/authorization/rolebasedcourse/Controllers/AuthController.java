@@ -4,8 +4,10 @@ import com.vodafone.authorization.rolebasedcourse.DTO.AuthResponseDto;
 import com.vodafone.authorization.rolebasedcourse.DTO.LoginDto;
 import com.vodafone.authorization.rolebasedcourse.DTO.RegisterDto;
 import com.vodafone.authorization.rolebasedcourse.Model.Role;
+import com.vodafone.authorization.rolebasedcourse.Model.Team;
 import com.vodafone.authorization.rolebasedcourse.Model.UserEntity;
 import com.vodafone.authorization.rolebasedcourse.Repositories.RoleRepository;
+import com.vodafone.authorization.rolebasedcourse.Repositories.TeamRepository;
 import com.vodafone.authorization.rolebasedcourse.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,14 +33,19 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+
+    private TeamRepository teamRepository;
     private PasswordEncoder passwordEncoder;
 
+
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository,
+                          RoleRepository roleRepository, PasswordEncoder passwordEncoder, TeamRepository teamRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.teamRepository = teamRepository;
     }
 
 
@@ -48,8 +58,20 @@ public class AuthController {
         user.setUsername(registerDto.getUsername());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
-        Role roles = roleRepository.findByName("USER").get();
+
+        Team team = registerDto.getTeam()!= null ? teamRepository.findByName(registerDto.getTeam()).get() : null;
+        Role roles;
+        if(team != null){
+            roles = roleRepository.findByTeamId(team.getId()).get();
+            team.setRoles(Collections.singletonList(roles));
+            user.setTeam(team);
+        }
+        else{
+            roles = roleRepository.findByName("USER").get();
+        }
+
         user.setRoles(Collections.singletonList(roles));
+
 
         userRepository.save(user);
 

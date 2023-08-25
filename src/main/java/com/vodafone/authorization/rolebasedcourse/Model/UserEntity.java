@@ -25,5 +25,9 @@ public class UserEntity {
         inverseJoinColumns = @JoinColumn(name = "role_id" , referencedColumnName = "id"))
     private List<Role> roles = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "team_id" , referencedColumnName = "id") // This indicates the foreign key column in the User table
+    private Team team;
+
 
 }
