@@ -19,20 +19,14 @@ import java.util.stream.Collectors;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("Username not found"));
-        return new User(user.getUsername(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+        return new CustomUserDetails(user);
     }
 
-    private Collection<GrantedAuthority> mapRolesToAuthorities(List<Role> roles){
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-    }
+
 }

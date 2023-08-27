@@ -5,6 +5,7 @@ import com.vodafone.authorization.rolebasedcourse.Services.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +27,10 @@ public class TopicController {
         return topicService.getTopicById(id);
     }
 
-    @PutMapping("/devTeam/updateTopic")
+    @PreAuthorize("#teamName == authentication.principal.team.name")
+    @PutMapping("/{teamName}/updateTopic")
     public ResponseEntity<String> updateTopic(@RequestBody Topic topic){
+        System.out.println("IN METHOD CONTROLLER");
         topicService.updateTopic(topic);
         return new ResponseEntity<>("Topic updated", HttpStatus.OK);
     }

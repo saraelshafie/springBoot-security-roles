@@ -15,20 +15,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/auth")
 public class AuthController {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
@@ -36,6 +39,12 @@ public class AuthController {
 
     private TeamRepository teamRepository;
     private PasswordEncoder passwordEncoder;
+
+    private SecurityContextRepository securityContextRepository =
+            new HttpSessionSecurityContextRepository();
+
+    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+
 
 
     @Autowired
@@ -49,36 +58,36 @@ public class AuthController {
     }
 
 
-    @PostMapping("register")
-    public ResponseEntity<String > register(@RequestBody RegisterDto registerDto){
-        if(userRepository.existsByUsername(registerDto.getUsername()))
-            return new ResponseEntity<>("Username is taken!!", HttpStatus.BAD_REQUEST);
+//    @PostMapping("/api/auth/register")
+//    public ResponseEntity<String > register(@RequestBody RegisterDto registerDto){
+//        if(userRepository.existsByUsername(registerDto.getUsername()))
+//            return new ResponseEntity<>("Username is taken!!", HttpStatus.BAD_REQUEST);
+//
+//        UserEntity user = new UserEntity();
+//        user.setUsername(registerDto.getUsername());
+//        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+//
+//
+//        Team team = registerDto.getTeam()!= null ? teamRepository.findByName(registerDto.getTeam()).get() : null;
+//        Role roles;
+//        if(team != null){
+//            roles = roleRepositorysitory.findByTeamId(team.getId()).get();
+//            team.setRoles(Collections.singletonList(roles));
+//            user.setTeams(Collections.singletonList(team));
+//        }
+//        else{
+//            roles = roleRepository.findByName("USER").get();
+//        }
+//
+////        user.setRoles(Collections.singletonList(roles));
+//
+//
+//        userRepository.save(user);
+//
+//        return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
+//    }
 
-        UserEntity user = new UserEntity();
-        user.setUsername(registerDto.getUsername());
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-
-
-        Team team = registerDto.getTeam()!= null ? teamRepository.findByName(registerDto.getTeam()).get() : null;
-        Role roles;
-        if(team != null){
-            roles = roleRepository.findByTeamId(team.getId()).get();
-            team.setRoles(Collections.singletonList(roles));
-            user.setTeam(team);
-        }
-        else{
-            roles = roleRepository.findByName("USER").get();
-        }
-
-        user.setRoles(Collections.singletonList(roles));
-
-
-        userRepository.save(user);
-
-        return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
-    }
-
-    @PostMapping("login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(),
@@ -87,5 +96,18 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication); //holds all the auth details to not log in each time
 
         return new ResponseEntity<>("User logged in successfully", HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/login")
+    public void login(@RequestBody LoginDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
+        UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
+                loginRequest.getUsername(), loginRequest.getPassword());
+        Authentication authentication = authenticationManager.authenticate(token);
+        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+        context.setAuthentication(authentication);
+        securityContextHolderStrategy.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
     }
 }

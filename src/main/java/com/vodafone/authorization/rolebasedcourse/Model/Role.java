@@ -16,9 +16,9 @@ public class Role {
     private int id;
 
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "team_id", referencedColumnName = "id") // This indicates the foreign key column in the Role table
-    private Team team;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "team_id", referencedColumnName = "id") // This indicates the foreign key column in the Role table
+//    private Team team;
 
 }

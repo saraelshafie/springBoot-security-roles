@@ -20,14 +20,15 @@ public class UserEntity {
     private String password;
 
 
-    @ManyToMany(fetch = FetchType.EAGER , cascade = CascadeType.ALL) //eager means whenever user loads its roles will be shown
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id" , referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id" , referencedColumnName = "id"))
-    private List<Role> roles = new ArrayList<>();
+//    @ManyToMany(fetch = FetchType.EAGER , cascade = CascadeType.ALL) //eager means whenever user loads its roles will be shown
+//    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id" , referencedColumnName = "id"),
+//        inverseJoinColumns = @JoinColumn(name = "role_id" , referencedColumnName = "id"))
+//    private List<Role> roles = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "team_id" , referencedColumnName = "id") // This indicates the foreign key column in the User table
-    private Team team;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_team", joinColumns = @JoinColumn(name = "user_id" , referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "team_id" , referencedColumnName = "id"))
+    private List<Team> teams = new ArrayList<>();
 
 
 }
