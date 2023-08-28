@@ -24,9 +24,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        for (Team team : user.getTeams()) {
-            authorities.addAll(mapRolesToAuthorities(team.getRoles()));
-        }
+
+        authorities.addAll(mapRolesToAuthorities(user.getTeam().getRoles()));
+
         return authorities;
     }
 

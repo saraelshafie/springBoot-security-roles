@@ -23,12 +23,13 @@ public class TopicController {
     }
 
     @GetMapping("/user/topics/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public Optional<Topic> getTopicById(@PathVariable Integer id){
         return topicService.getTopicById(id);
     }
 
-    @PreAuthorize("#teamName == authentication.principal.team.name")
-    @PutMapping("/{teamName}/updateTopic")
+    @PutMapping("/devTeam/updateTopic")
+    @PreAuthorize("hasAnyAuthority('ADMIN','DEV')")
     public ResponseEntity<String> updateTopic(@RequestBody Topic topic){
         System.out.println("IN METHOD CONTROLLER");
         topicService.updateTopic(topic);
@@ -36,6 +37,7 @@ public class TopicController {
     }
 
     @PostMapping("/admin/addTopic")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> addTopic(@RequestBody Topic topic){
         topicService.addTopic(topic);
         return new ResponseEntity<>("Topic added", HttpStatus.OK);

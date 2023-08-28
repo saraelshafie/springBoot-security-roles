@@ -13,23 +13,26 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
 
-        if (configAttributes == null) {
+        if (configAttributes == null)
             return; // No specific access requirements, access is allowed
-        }
+
         for(ConfigAttribute configAttribute : configAttributes){
             String requiredAttribute = configAttribute.getAttribute();
+            System.out.println("REQUIRED " + requiredAttribute);
             if(requiredAttribute == null)
                 continue;
-            for(GrantedAuthority grantedAuthority: authentication.getAuthorities())
-                if(requiredAttribute.equals(grantedAuthority.getAuthority()))
+
+            for(GrantedAuthority grantedAuthority: authentication.getAuthorities()) {
+                System.out.println("AUTH: " + grantedAuthority.getAuthority());
+                if (requiredAttribute.equals(grantedAuthority.getAuthority()))
                     return;
+            }
         }
 
         throw new AccessDeniedException("Access is denied");
     }
     @Override
     public boolean supports(ConfigAttribute attribute) {
-        // Implement as needed
         return true;
     }
 
@@ -37,7 +40,6 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        // Implement as needed
         return true;
     }
 }

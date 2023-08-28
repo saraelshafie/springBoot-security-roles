@@ -12,11 +12,9 @@ INSERT INTO TOPICS (id ,description, name) VALUES (1, 'Frontend Course', 'React 
 INSERT INTO TEAM_ROLE (team_id, role_id) VALUES (1,1);
 INSERT INTO TEAM_ROLE (team_id, role_id) VALUES (2,2);
 
-INSERT INTO USERS VALUES (1,'1234','dareenDev');
-INSERT INTO USERS VALUES (2,'1234','dareenAdmin');
+INSERT INTO USERS VALUES (1,'1234','dareenDev', 1);
+INSERT INTO USERS VALUES (2,'1234','dareenAdmin', 2);
 
-INSERT INTO USER_TEAM (user_id, team_id) VALUES (1,1);
-INSERT INTO USER_TEAM (user_id, team_id) VALUES (2,2);
 
 
 

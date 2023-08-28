@@ -25,10 +25,9 @@ public class UserEntity {
 //        inverseJoinColumns = @JoinColumn(name = "role_id" , referencedColumnName = "id"))
 //    private List<Role> roles = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_team", joinColumns = @JoinColumn(name = "user_id" , referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "team_id" , referencedColumnName = "id"))
-    private List<Team> teams = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "team_id") // This column will store the team's foreign key
+    private Team team;
 
 
 }
